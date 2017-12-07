@@ -55,6 +55,7 @@
 #include <iterator>
 #include <limits>
 #include <locale>
+#include <memory>
 #include <ostream>
 #include <ratio>
 #include <sstream>
@@ -6996,6 +6997,8 @@ from_stream(std::basic_istream<CharT, Traits>& is, const CharT* fmt,
                 else if (day(static_cast<unsigned>(d)) != ymd.day())
                     goto broken;
             }
+            if (Y < static_cast<int>(year::min()) || Y > static_cast<int>(year::max()))
+                Y = not_a_year;
             auto ymd = year{Y}/m/d;
             if (wd != not_a_weekday && ymd.ok())
             {

@@ -337,11 +337,11 @@ discover_tz_dir()
     if (!(lstat(timezone, &sb) == 0 && S_ISLNK(sb.st_mode) && sb.st_size > 0))
         throw runtime_error("discover_tz_dir failed\n");
     string result;
-    char rp[PATH_MAX];
-    if (realpath(timezone, rp))
+    char rp[PATH_MAX+1] = {};
+    if (readlink(timezone, rp, sizeof(rp)-1) > 0)
         result = string(rp);
     else
-        throw system_error(errno, system_category(), "realpath() failed");
+        throw system_error(errno, system_category(), "readlink() failed");
     auto i = result.find("zoneinfo");
     if (i == string::npos)
         throw runtime_error("discover_tz_dir failed to find zoneinfo\n");
@@ -2786,6 +2786,7 @@ download_to_string(const std::string& url, std::string& str)
     };
     curl_easy_setopt(curl.get(), CURLOPT_WRITEFUNCTION, write_cb);
     curl_easy_setopt(curl.get(), CURLOPT_WRITEDATA, &str);
+    curl_easy_setopt(curl.get(), CURLOPT_SSL_VERIFYPEER, false);
     auto res = curl_easy_perform(curl.get());
     return (res == CURLE_OK);
 }
@@ -2804,6 +2805,7 @@ download_to_file(const std::string& url, const std::string& local_filename,
     if (!curl)
         return false;
     curl_easy_setopt(curl.get(), CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl.get(), CURLOPT_SSL_VERIFYPEER, false);
     curl_write_callback write_cb = [](char* contents, std::size_t size, std::size_t nmemb,
                                       void* userp) -> std::size_t
     {
@@ -2831,7 +2833,7 @@ remote_version()
 {
     std::string version;
     std::string str;
-    if (download_to_string("http://www.iana.org/time-zones", str))
+    if (download_to_string("https://www.iana.org/time-zones", str))
     {
         CONSTDATA char db[] = "/time-zones/releases/tzdata";
         CONSTDATA auto db_size = sizeof(db) - 1;
@@ -3238,7 +3240,7 @@ remote_download(const std::string& version)
     }
 #  endif  // _WIN32
 
-    auto url = "http://www.iana.org/time-zones/releases/tzdata" + version +
+    auto url = "https://data.iana.org/time-zones/releases/tzdata" + version +
                ".tar.gz";
     bool result = download_to_file(url, get_download_gz_file(version),
                                    download_file_options::binary);
@@ -3652,11 +3654,11 @@ tzdb::current_zone() const
         if (lstat(timezone, &sb) == 0 && S_ISLNK(sb.st_mode) && sb.st_size > 0) {
             using namespace std;
             string result;
-            char rp[PATH_MAX];
-            if (realpath(timezone, rp))
+            char rp[PATH_MAX+1] = {};
+            if (readlink(timezone, rp, sizeof(rp)-1) > 0)
                 result = string(rp);
             else
-                throw system_error(errno, system_category(), "realpath() failed");
+                throw system_error(errno, system_category(), "readlink() failed");
 
             const size_t pos = result.find(tz_dir);
             if (pos != result.npos)
@@ -3680,11 +3682,11 @@ tzdb::current_zone() const
         if (lstat(timezone, &sb) == 0 && S_ISLNK(sb.st_mode) && sb.st_size > 0) {
             using namespace std;
             string result;
-            char rp[PATH_MAX];
-            if (realpath(timezone, rp))
+            char rp[PATH_MAX+1] = {};
+            if (readlink(timezone, rp, sizeof(rp)-1) > 0)
                 result = string(rp);
             else
-                throw system_error(errno, system_category(), "realpath() failed");
+                throw system_error(errno, system_category(), "readlink() failed");
 
             const size_t pos = result.find(tz_dir);
             if (pos != result.npos)
