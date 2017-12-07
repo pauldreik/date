@@ -44,6 +44,11 @@ then
 	CXX=clang++
 fi
 
+if ! which $CXX >/dev/null ; then
+    echo "Can not find CXX compiler: $CXX"
+    exit 1
+fi
+
 if [ -z "$CXX_LANG" ]
 then
     CXX_LANG=c++14
