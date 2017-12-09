@@ -1,14 +1,15 @@
 dateh (0.0.0-2) unstable; urgency=medium
 
   * merge upstream master as of 20171207
+  * ignore cmake, ship the cpp instead of a compiled lib.
 
- -- Paul Dreik <paul.dreik@dreik.se>  Thu, 07 Dec 2017 21:44:04 +0100
+ -- Paul Dreik <github@pauldreik.se>  Thu, 07 Dec 2017 21:44:04 +0100
 
 dateh (0.0.0-1) unstable; urgency=medium
 
   * ship the cpp file in /usr/share
 
- -- Paul Dreik <paul.dreik@dreik.se>  Thu, 07 Dec 2017 21:31:20 +0100
+ -- Paul Dreik <github@pauldreik.se>  Thu, 07 Dec 2017 21:31:20 +0100
 
 dateh (0.0.0-0) unstable; urgency=medium
 
